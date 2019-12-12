@@ -1,0 +1,46 @@
+---
+title: "SDS project"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+##Maybe this will work?? 
+
+##So we have two data sets for Austin, each with specific date associations 
+
+##Dataset 1 has ambulance information for austin and travis county 
+##Dataset 2 has information about average housing costs etc
+
+EMS<-EMS_._Ambulance_Responses_by_Month
+Electric<-Residential_Average_Monthly_kWh_and_Bills
+
+##We're going to join them by date 
+##First I'm going to make sure the name for the variable I'm joinging by (date) is actually the same in both datasets, by re-naming it in one of them so they match 
+
+EMS$Date<-EMS$Month.Year
+
+##First, I'm just going to join and see how many observations that leaves 
+
+Data<-inner_join(EMS,Electric, by="Date")
+nrow(Data)
+View(Data)
+
+##Only 102 rows, which is great, but there are 25 colums, so I'm going to use select functions to drop ones I'm not going to look at further. We're going to keep date, average Kw, average bill, Austin ambulance responses, Travis country ambulance responses, 
+
+Data<-Data%>%select(Total.Austin.Responses,Total.Travis.County.Responses,Date,Average.kWh,Average.Bill,Month.Key)
+
+Data<-Data%>%select(-Date)
+View(Data)##Cool, that's more workable. 
+
+##So one thing here is that month and year are lumped together in "data" and I want to separate them. 
+
+
+Data2<-Data%>%pivot_wider(names_from=c(month, year), values_from=Month.Key)
+
+
+
+
